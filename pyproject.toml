@@ -8,4 +8,11 @@ dependencies = [
     "fastmcp==2.11.1",
     "uvicorn>=0.36.0",
     "google-cloud-storage",
+    "google-cloud-aiplatform",
+    "google-cloud-documentai",
+    "google-genai",
+    "vertexai",
+    "pillow",
+    "matplotlib",
+    "requests",
 ]

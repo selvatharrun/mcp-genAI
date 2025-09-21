@@ -24,25 +24,25 @@ COPY . /app
 # Ensure that uv can find its binaries by adding them to the PATH.
 ENV PATH="/bin:${PATH}"
 
-
-# ... previous steps ...
-ENV PATH="/bin:${PATH}"
-
 # Create the virtual environment explicitly
 RUN python -m venv /app/.venv
+
+# Ensure the Class directory exists and has the __init__.py file
+RUN touch /app/Class/__init__.py
 
 # Activate the virtual environment and then run uv sync
 RUN . /app/.venv/bin/activate && uv sync
 
-# Install Python dependencies using uv sync.
-# `uv sync` installs dependencies from pyproject.toml and uv.lock (if present).
-# If you have a `uv.lock` file, uv will use it to ensure reproducible builds.
-# RUN uv sync
+# Set PYTHONPATH to include the app directory so Class module can be imported
+ENV PYTHONPATH="/app:${PYTHONPATH}"
+
+# Ensure the Class directory is properly accessible
+RUN ls -la /app/Class/
 
 # Cloud Run services listen on the port specified by the PORT environment variable.
 # Expose this port so Docker knows your application listens on it.
 EXPOSE $PORT
 
 # Command to run your application.
-# `uv run` executes a script or a module. If your FastMCP app is in `main.py`, use `main.py`.
-CMD ["uv", "run", "mcp_app.py", "--host", "0.0.0.0", "--port", "8080"]
+# Set PYTHONPATH to ensure module imports work correctly in the container
+CMD ["sh", "-c", "PYTHONPATH=/app uv run mcp_app.py --host 0.0.0.0 --port 8080"]
